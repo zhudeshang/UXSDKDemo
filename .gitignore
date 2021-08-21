@@ -1,0 +1,13 @@
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+
+# Project exclude paths
+/AMap_2DMap_V2.8.1_20160202/build/
+/AMap_Search_V3.2.1_20160308/build/
