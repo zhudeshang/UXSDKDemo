@@ -174,28 +174,34 @@
         android:layout_height="50dp"
         android:orientation="horizontal">
         <Button
-            android:id="@+id/locate"
+            android:id="@+id/way_point1"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:text="Locate"
+            android:textSize="8sp"
+            android:layout_gravity="right|center_vertical"
+            android:text="Map"
         />
 
         <Button
             android:id="@+id/tv_activation_state_info"
             android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
+            android:textSize="8sp"
+            android:layout_gravity="right|center_vertical"
             android:text="Unknown"/>
         <Button
             android:id="@+id/btn_login"
             android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
+            android:textSize="8sp"
+            android:layout_gravity="right|center_vertical"
             android:text="登录" />
 
-        <Button
-            android:id="@+id/btn_logout"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text="登出" />
+<!--        <Button-->
+<!--            android:id="@+id/btn_logout"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:text="登出" />-->
     </LinearLayout>
 
 

@@ -33,8 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AppActivationManager appActivationManager;
     private AppActivationState.AppActivationStateListener activationStateListener;
     protected Button loginBtn;
-    protected Button locate;
-    protected Button logoutBtn;
+    protected Button way_point1;
     protected Button appActivationStateTV;
     private AircraftBindingState.AircraftBindingStateListener bindingStateListener;
 
@@ -64,33 +63,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void initUI(){
 
-        locate = (Button) findViewById(R.id.locate);
-        locate.setOnClickListener(this);
+        way_point1 = (Button) findViewById(R.id.way_point1);
+        way_point1.setOnClickListener(this);
 
         appActivationStateTV = (Button) findViewById(R.id.tv_activation_state_info);
         loginBtn = (Button) findViewById(R.id.btn_login);
-        logoutBtn = (Button) findViewById(R.id.btn_logout);
         loginBtn.setOnClickListener(this);
-        logoutBtn.setOnClickListener(this);
 
     }
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.locate:{
-                Intent intent = new Intent(this, MapActivity.class);
-                startActivity(intent);
+            case R.id.way_point1:{
+//                Intent intent = new Intent(this, Waypoint1Activity.class);
+//                startActivity(intent);
+
+                startActivity(MainActivity.this, Waypoint1Activity.class);
                 break;
             }
             case R.id.btn_login:{
-                loginAccount();
+                login();
                 break;
             }
-            case R.id.btn_logout:{
-                logoutAccount();
-                break;
-            }
+//            case R.id.btn_setting:{
+//                setting();
+//                break;
+//            }
             default:
                 break;
         }
@@ -167,7 +166,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
         }
     }
-
+    public boolean isLog=false;
+    private void  login(){
+       if(isLog){
+           logoutAccount();
+       }else {
+           loginAccount();
+       }
+    }
     private static final int COMPLETED = 0;
     private void loginAccount(){
 
@@ -177,8 +183,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onSuccess(final UserAccountState userAccountState) {
                         Log.d(TAG,"Login Success");
 //                        appActivationStateTV.setText("Login");
-                        if(userAccountState.name().equals("AUTHORIZED"))
-                        handler.sendMessage(handler.obtainMessage(COMPLETED, "Login"));
+                        if(userAccountState.name().equals("AUTHORIZED")) {
+                            handler.sendMessage(handler.obtainMessage(COMPLETED, "Login"));
+                        }
                     }
                     @Override
                     public void onFailure(DJIError error) {
@@ -192,10 +199,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
-              if(msg.obj.toString().equals("Login"))
-                appActivationStateTV.setText("已登录"); //UI更改操作
+              if(msg.obj.toString().equals("Login")) {
+                  appActivationStateTV.setText("已登录"); //UI更改操作
+                  loginBtn.setText("注销");
+              }
                 else {
                   appActivationStateTV.setText("未登录");
+                  loginBtn.setText("登录");
               }
             }
         }
@@ -215,6 +225,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
+//    private void setting(){
+//        Intent intent = new Intent(this, Setting.class);
+//        startActivity(intent);
+//    }
     @Override
     public void onResume() {
         Log.e(TAG, "onResume");
