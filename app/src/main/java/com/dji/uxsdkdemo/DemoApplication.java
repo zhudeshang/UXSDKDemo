@@ -17,6 +17,8 @@ import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.camera.Camera;
+import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
@@ -42,7 +44,16 @@ public class DemoApplication extends Application {
     public DemoApplication() {
 
     }
+    public static synchronized Camera getCameraInstance() {
 
+        if (getProductInstance() == null) return null;
+
+        Camera camera = null;
+        if (getProductInstance() instanceof Aircraft){
+            camera = ((Aircraft) getProductInstance()).getCamera();
+        }
+        return camera;
+    }
     /**
      * This function is used to get the instance of DJIBaseProduct.
      * If no product is connected, it returns null.
