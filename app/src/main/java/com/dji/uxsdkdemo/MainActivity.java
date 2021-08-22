@@ -10,7 +10,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,9 +24,15 @@ import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.realname.AppActivationManager;
 import dji.sdk.sdkmanager.DJISDKManager;
+import dji.sdk.sdkmanager.LiveStreamManager;
 import dji.sdk.useraccount.UserAccountManager;
 
+
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private String liveShowUrl = "please input your live show url here";
+
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -37,6 +45,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected Button appActivationStateTV;
     private AircraftBindingState.AircraftBindingStateListener bindingStateListener;
 
+
+    private LiveStreamManager.OnLiveChangeListener listener;
+    private LiveStreamManager.LiveStreamVideoSource currentVideoSource = LiveStreamManager.LiveStreamVideoSource.Primary;
+
+    private EditText showUrlInputEdit;
+    private Button startLiveShowBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,15 +84,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginBtn = (Button) findViewById(R.id.btn_login);
         loginBtn.setOnClickListener(this);
 
+        showUrlInputEdit = (EditText) findViewById(R.id.edit_live_show_url_input);
+        showUrlInputEdit.setText(liveShowUrl);
+
+        startLiveShowBtn = (Button) findViewById(R.id.btn_start_live_show);
+        startLiveShowBtn.setOnClickListener(this);
     }
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
+            case R.id.btn_start_live_show:
+                startLiveShow();
+                break;
             case R.id.way_point1:{
-//                Intent intent = new Intent(this, Waypoint1Activity.class);
-//                startActivity(intent);
-
                 startActivity(MainActivity.this, Waypoint1Activity.class);
                 break;
             }
@@ -117,6 +136,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
+        listener = new LiveStreamManager.OnLiveChangeListener() {
+            @Override
+            public void onStatusChanged(int i) {
+                ToastUtils("status changed : " + i);
+            }
+        };
     }
     private void setUpListener() {
         // Example of Listener
@@ -144,8 +169,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
             }
         };
-    }
 
+        if (isLiveStreamManagerOn()){
+            DJISDKManager.getInstance().getLiveStreamManager().registerListener(listener);
+        }
+    }
+    private boolean isLiveStreamManagerOn() {
+        if (DJISDKManager.getInstance().getLiveStreamManager() == null) {
+            Toast.makeText(getApplicationContext(),"No live stream manager!",Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
     private void tearDownListener() {
         if (activationStateListener != null) {
             appActivationManager.removeAppActivationStateListener(activationStateListener);
@@ -156,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
+
         if (bindingStateListener !=null) {
             appActivationManager.removeAircraftBindingStateListener(bindingStateListener);
             MainActivity.this.runOnUiThread(new Runnable() {
@@ -164,6 +200,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    bindingStateTV.setText("Unknown");
                 }
             });
+        }
+
+        if (isLiveStreamManagerOn()){
+            DJISDKManager.getInstance().getLiveStreamManager().unregisterListener(listener);
         }
     }
     public boolean isLog=false;
@@ -174,14 +214,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
            loginAccount();
        }
     }
-    private static final int COMPLETED = 0;
     private void loginAccount(){
 
         UserAccountManager.getInstance().logIntoDJIUserAccount(this,
                 new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
                     @Override
                     public void onSuccess(final UserAccountState userAccountState) {
-                        Log.d(TAG,"Login Success");
+                        Toast.makeText(getApplicationContext(),"Login Success",Toast.LENGTH_LONG).show();
 //                        appActivationStateTV.setText("Login");
                         if(userAccountState.name().equals("AUTHORIZED")) {
                             handler.sendMessage(handler.obtainMessage(COMPLETED, "Login"));
@@ -189,46 +228,95 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     @Override
                     public void onFailure(DJIError error) {
-                        Log.d(TAG,"Login Error:"
-                                + error.getDescription());
+                        Toast.makeText(getApplicationContext(),"Login Error:"
+                                + error.getDescription(),Toast.LENGTH_LONG).show();
+
                     }
                 });
 
     }
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == COMPLETED) {
-              if(msg.obj.toString().equals("Login")) {
-                  appActivationStateTV.setText("已登录"); //UI更改操作
-                  loginBtn.setText("注销");
-              }
-                else {
-                  appActivationStateTV.setText("未登录");
-                  loginBtn.setText("登录");
-              }
-            }
-        }
-    };
     private void logoutAccount(){
         UserAccountManager.getInstance().logoutOfDJIUserAccount(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 if (null == error) {
+                    Toast.makeText(getApplicationContext(),"Login Success",Toast.LENGTH_LONG).show();
                     Log.d(TAG,"Logout Success");
                     handler.sendMessage(handler.obtainMessage(COMPLETED, "Logout"));
 
                 } else {
+                    Toast.makeText(getApplicationContext(),"Logout Error:"
+                            + error.getDescription(),Toast.LENGTH_LONG).show();
                     Log.d(TAG,"Logout Error:"
                             + error.getDescription());
                 }
             }
         });
     }
+    private static final int COMPLETED = 0;
+    private static final int LiveStre = 0;
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == COMPLETED) {
+                if(msg.obj.toString().equals("Login")) {
+                    appActivationStateTV.setText("已登录"); //UI更改操作
+                    loginBtn.setText("注销");
+                }
+                else {
+                    appActivationStateTV.setText("未登录");
+                    loginBtn.setText("登录");
+                }
+            }
+            else if (msg.what == LiveStre){
+                if(msg.obj.toString().equals("0")) {
+                    Toast.makeText(getApplicationContext(),"开始直播!",Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    };
 //    private void setting(){
 //        Intent intent = new Intent(this, Setting.class);
 //        startActivity(intent);
 //    }
+    void startLiveShow() {
+    ToastUtils("Start Live Show");
+    if (!isLiveStreamManagerOn()) {
+        return;
+    }
+    if (DJISDKManager.getInstance().getLiveStreamManager().isStreaming()) {
+        ToastUtils("already started!");
+        return;
+    }
+    new Thread() {
+        @Override
+        public void run() {
+            DJISDKManager.getInstance().getLiveStreamManager().setLiveUrl(liveShowUrl);
+            int result = DJISDKManager.getInstance().getLiveStreamManager().startStream();
+
+            handler.sendMessage(handler.obtainMessage(LiveStre, result));
+
+            DJISDKManager.getInstance().getLiveStreamManager().setStartTime();
+        }
+    }.start();
+}
+
+    private void changeVideoSource() {
+        if (!isLiveStreamManagerOn()) {
+            return;
+        }
+        if (DJISDKManager.getInstance().getLiveStreamManager().isStreaming()) {
+            ToastUtils("在更改直播源之前，您应该停止直播!");
+            return;
+        }
+        currentVideoSource = (currentVideoSource == LiveStreamManager.LiveStreamVideoSource.Primary) ?
+                LiveStreamManager.LiveStreamVideoSource.Secoundary :
+                LiveStreamManager.LiveStreamVideoSource.Primary;
+        DJISDKManager.getInstance().getLiveStreamManager().setVideoSource(currentVideoSource);
+
+        ToastUtils("改变成功!直播源: " + currentVideoSource.name());
+    }
+
     @Override
     public void onResume() {
         Log.e(TAG, "onResume");
@@ -260,5 +348,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.finish();
     }
 
+    public void  ToastUtils(String string){
+        Toast.makeText(getApplicationContext(),string,Toast.LENGTH_LONG).show();
+    }
 }
 

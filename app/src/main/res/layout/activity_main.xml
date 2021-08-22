@@ -8,7 +8,7 @@
     android:orientation="horizontal"
     tools:context=".MainActivity">
 
-    <!-- Widget to see first person view (FPV) -->
+    <!-- 查看第一人称视图(FPV)的部件 -->
     <dji.ux.widget.FPVWidget
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
@@ -197,12 +197,26 @@
             android:layout_gravity="right|center_vertical"
             android:text="登录" />
 
+
+        <EditText
+            android:id="@+id/edit_live_show_url_input"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:inputType="textUri" />
+
+        <Button
+            android:id="@+id/btn_start_live_show"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:textSize="8sp"
+            android:text="开始直播" />
 <!--        <Button-->
 <!--            android:id="@+id/btn_logout"-->
 <!--            android:layout_width="50dp"-->
 <!--            android:layout_height="50dp"-->
 <!--            android:text="登出" />-->
     </LinearLayout>
+
 
 
 

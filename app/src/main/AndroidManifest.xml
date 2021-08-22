@@ -73,9 +73,11 @@
 
         <activity
             android:name=".Waypoint1Activity"
+            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Waypoint2Activity"
+            android:exported="true"
             android:screenOrientation="portrait" />
     </application>
 
