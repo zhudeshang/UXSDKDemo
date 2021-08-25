@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.dji.uxsdkdemo">
     <!-- DJI SDK need permission -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -33,21 +34,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".HomeActivity"
+            android:screenOrientation="landscape"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MapActivity"
-            android:exported="true" />
-        <!-- DJI SDK -->
-        <uses-library android:name="com.android.future.usb.accessory" />
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <meta-data
-            android:name="com.dji.sdk.API_KEY"
-            android:value="fa53ec2f19d46e21c963cda5" /> <!-- 启用高德地图服务 -->
-        <meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="8362273909bcdc1963bec9fc88675c4e" />
-
+            android:allowBackup="true"
+            android:exported="true" /> <!-- DJI SDK -->
         <activity
             android:name="dji.sdk.sdkmanager.DJIAoaControllerActivity"
             android:theme="@android:style/Theme.Translucent">
@@ -60,17 +58,11 @@
                 android:resource="@xml/accessory_filter" />
         </activity>
 
-        <service android:name="dji.sdk.sdkmanager.DJIGlobalService" /> <!-- DJI SDK -->
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-
         <activity
             android:name=".Waypoint1Activity"
             android:exported="true"
@@ -79,6 +71,22 @@
             android:name=".Waypoint2Activity"
             android:exported="true"
             android:screenOrientation="portrait" />
+
+        <uses-library android:name="com.android.future.usb.accessory" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <meta-data
+            android:name="com.dji.sdk.API_KEY"
+            android:value="fa53ec2f19d46e21c963cda5" /> <!-- 启用高德地图服务 -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="8362273909bcdc1963bec9fc88675c4e" />
+
+
+        <service android:name="dji.sdk.sdkmanager.DJIGlobalService"
+            tools:ignore="Instantiatable" /> <!-- DJI SDK -->
     </application>
 
 </manifest>

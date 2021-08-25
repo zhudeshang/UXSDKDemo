@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:src="@drawable/fly" />
+    <TextView
+        android:id="@+id/tv_binding_state_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="未连接无人机"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/iv1"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/dji_logo"
+        />
+
+    <Button
+        android:id="@+id/btn_login"
+        style="@style/common_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="40dp"
+        android:text="登录"
+        android:textSize="22sp" />
+
+
+    <Button
+        android:id="@+id/btn_setting"
+        style="@style/common_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/btn_login"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="-118dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="158dp"
+        android:layout_toStartOf="@+id/btn_login"
+        android:text="设置"
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/tv_activation_state_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="未登录"
+        android:textColor="@color/black"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="60dp"
+        android:textSize="22sp"
+        />
+
+    <ImageView
+        android:id="@+id/iv2"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/dji_fly"
+        />
+
+    <Button
+        android:id="@+id/begin_fly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+
+        android:text="开始飞行"
+        android:textColor="@color/black"
+        android:textSize="30sp" />
+</RelativeLayout>

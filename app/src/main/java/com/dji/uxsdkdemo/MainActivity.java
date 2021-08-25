@@ -76,9 +76,11 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
 
     private AppActivationManager appActivationManager;
     private AppActivationState.AppActivationStateListener activationStateListener;
-    protected Button loginBtn;
+//    protected Button loginBtn;
     protected Button way_point1;
-    protected Button appActivationStateTV;
+    protected Button open_track;
+//    protected Button appActivationStateTV;
+    //飞机绑定状态监听器
     private AircraftBindingState.AircraftBindingStateListener bindingStateListener;
 
 
@@ -128,10 +130,12 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
 
         way_point1 = (Button) findViewById(R.id.way_point1);
         way_point1.setOnClickListener(this);
+        open_track = (Button) findViewById(R.id.btn_open_track);
+        open_track.setOnClickListener(this);
 
-        appActivationStateTV = (Button) findViewById(R.id.tv_activation_state_info);
-        loginBtn = (Button) findViewById(R.id.btn_login);
-        loginBtn.setOnClickListener(this);
+//        appActivationStateTV = (Button) findViewById(R.id.tv_activation_state_info);
+//        loginBtn = (Button) findViewById(R.id.btn_login);
+//        loginBtn.setOnClickListener(this);
 
         showUrlInputEdit = (EditText) findViewById(R.id.edit_live_show_url_input);
         showUrlInputEdit.setText(liveShowUrl);
@@ -168,8 +172,15 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
                 startActivity(MainActivity.this, Waypoint1Activity.class);
                 break;
             }
-            case R.id.btn_login:{
-                login();
+            case R.id.btn_open_track:{
+                if(mBgLayout.getVisibility()==View.INVISIBLE) {
+                    ToastUtils("启用跟踪模式");
+                    mBgLayout.setVisibility(View.VISIBLE);
+                }
+                else{
+                    ToastUtils("关闭跟踪模式");
+                    mBgLayout.setVisibility(View.INVISIBLE);
+                }
                 break;
             }
 
@@ -194,7 +205,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
 
                         @Override
                         public void onResult(DJIError error) {
-                            setResultToToast(error == null ? "Accept Confirm Success!" : error.getDescription());
+                            setResultToToast(error == null ? "接受确认成功!" : error.getDescription());
                         }
                     });
 
@@ -216,7 +227,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
 
                     @Override
                     public void onResult(DJIError error) {
-                        setResultToToast(error == null ? "Stop track Success!" : error.getDescription());
+                        setResultToToast(error == null ? "停止跟踪成功!" : error.getDescription());
                     }
                 });
 
@@ -241,7 +252,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
                     @Override
                     public void onResult(DJIError error) {
 
-                        setResultToToast(error == null ? "Reject Confirm Success!" : error.getDescription());
+                        setResultToToast(error == null ? "拒绝确认成功!" : error.getDescription());
                     }
                 });
                 runOnUiThread(new Runnable() {
@@ -289,7 +300,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    appActivationStateTV.setText("" + appActivationManager.getAppActivationState());
+//                    appActivationStateTV.setText("" + appActivationManager.getAppActivationState());
                 }
             });
         }
@@ -308,7 +319,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        appActivationStateTV.setText("" + appActivationState);
+//                        appActivationStateTV.setText("" + appActivationState);
                     }
                 });
             }
@@ -337,22 +348,22 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
         }
 
         mActiveTrackOperator.addListener(this);
-        mActiveTrackOperator.getRetreatEnabled(new CommonCallbacks.CompletionCallbackWith<Boolean>() {
-            @Override
-            public void onSuccess(final Boolean aBoolean) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-//                        mPushBackSw.setChecked(aBoolean);
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(DJIError error) {
-                setResultToToast("can't get retreat enable state " + error.getDescription());
-            }
-        });
+//        mActiveTrackOperator.getRetreatEnabled(new CommonCallbacks.CompletionCallbackWith<Boolean>() {
+//            @Override
+//            public void onSuccess(final Boolean aBoolean) {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+////                        mPushBackSw.setChecked(aBoolean);
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onFailure(DJIError error) {
+//                setResultToToast("can't get retreat enable state " + error.getDescription());
+//            }
+//        });
     }
     private boolean isLiveStreamManagerOn() {
         if (DJISDKManager.getInstance().getLiveStreamManager() == null) {
@@ -367,7 +378,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    appActivationStateTV.setText("Unknown");
+//                    appActivationStateTV.setText("Unknown");
                 }
             });
         }
@@ -387,52 +398,6 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
         }
     }
     public boolean isLog=false;
-    private void  login(){
-       if(isLog){
-           logoutAccount();
-       }else {
-           loginAccount();
-       }
-    }
-    private void loginAccount(){
-
-        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
-                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
-                    @Override
-                    public void onSuccess(final UserAccountState userAccountState) {
-                        Toast.makeText(getApplicationContext(),"Login Success",Toast.LENGTH_LONG).show();
-//                        appActivationStateTV.setText("Login");
-                        if(userAccountState.name().equals("AUTHORIZED")) {
-                            handler.sendMessage(handler.obtainMessage(COMPLETED, "Login"));
-                        }
-                    }
-                    @Override
-                    public void onFailure(DJIError error) {
-                        Toast.makeText(getApplicationContext(),"Login Error:"
-                                + error.getDescription(),Toast.LENGTH_LONG).show();
-
-                    }
-                });
-
-    }
-    private void logoutAccount(){
-        UserAccountManager.getInstance().logoutOfDJIUserAccount(new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError error) {
-                if (null == error) {
-                    Toast.makeText(getApplicationContext(),"Login Success",Toast.LENGTH_LONG).show();
-                    Log.d(TAG,"Logout Success");
-                    handler.sendMessage(handler.obtainMessage(COMPLETED, "Logout"));
-
-                } else {
-                    Toast.makeText(getApplicationContext(),"Logout Error:"
-                            + error.getDescription(),Toast.LENGTH_LONG).show();
-                    Log.d(TAG,"Logout Error:"
-                            + error.getDescription());
-                }
-            }
-        });
-    }
     private static final int COMPLETED = 0;
     private static final int LiveStre = 1;
     private Handler handler = new Handler(){
@@ -440,12 +405,12 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
                 if(msg.obj.toString().equals("Login")) {
-                    appActivationStateTV.setText("已登录"); //UI更改操作
-                    loginBtn.setText("注销");
+//                    appActivationStateTV.setText("已登录"); //UI更改操作
+//                    loginBtn.setText("注销");
                 }
                 else {
-                    appActivationStateTV.setText("未登录");
-                    loginBtn.setText("登录");
+//                    appActivationStateTV.setText("未登录");
+//                    loginBtn.setText("登录");
                 }
             }
             else if (msg.what == LiveStre){
@@ -573,8 +538,8 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
                             if (error == null) {
                                 isDrawingRect = false;
                             }
-                            ToastUtils("Start Tracking: " + (error == null
-                                    ? "Success"
+                            ToastUtils("开始跟踪: " + (error == null
+                                    ? "成功"
                                     : error.getDescription()));
                         }
                     });
