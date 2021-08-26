@@ -170,51 +170,28 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
+        android:layout_marginTop="15dp"
         android:orientation="horizontal">
         <Button
-            android:id="@+id/way_point1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:textSize="8sp"
-            android:layout_gravity="right|center_vertical"
-            android:text="Map"
-        />
-
-        <EditText
-            android:id="@+id/edit_live_show_url_input"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:inputType="textUri" />
-
-        <Button
-            android:id="@+id/btn_start_live_show"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="8sp"
-            android:text="开始直播" />
-        <Button
             android:id="@+id/btn_open_track"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:textSize="8sp"
             android:text="开启跟踪模式" />
-<!--        <Button-->
-<!--            android:id="@+id/tv_activation_state_info"-->
-<!--            android:layout_width="50dp"-->
-<!--            android:layout_height="40dp"-->
-<!--            android:textSize="8sp"-->
-<!--            android:layout_gravity="right|center_vertical"-->
-<!--            android:text="Unknown"/>-->
-<!--        <Button-->
-<!--            android:id="@+id/btn_login"-->
-<!--            android:layout_width="50dp"-->
-<!--            android:layout_height="40dp"-->
-<!--            android:textSize="8sp"-->
-<!--            android:layout_gravity="right|center_vertical"-->
-<!--            android:text="登录" />-->
-
+        <Button
+            android:id="@+id/way_point1"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textSize="8sp"
+            android:text="Map" />
+        <Button
+            android:id="@+id/btn_start_live_show"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textSize="8sp"
+            android:text="开始直播" />
 
     </LinearLayout>
 

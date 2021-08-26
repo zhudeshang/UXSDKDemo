@@ -3,6 +3,7 @@ package com.dji.uxsdkdemo;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -137,8 +138,6 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
 //        loginBtn = (Button) findViewById(R.id.btn_login);
 //        loginBtn.setOnClickListener(this);
 
-        showUrlInputEdit = (EditText) findViewById(R.id.edit_live_show_url_input);
-        showUrlInputEdit.setText(liveShowUrl);
 
         startLiveShowBtn = (Button) findViewById(R.id.btn_start_live_show);
         startLiveShowBtn.setOnClickListener(this);
@@ -438,6 +437,9 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
     new Thread() {
         @Override
         public void run() {
+            SharedPreferences sharedPreferences =
+                    getSharedPreferences("setting", Context.MODE_PRIVATE);
+            liveShowUrl = (sharedPreferences.getString("url", "请输入直播地址!"));
             DJISDKManager.getInstance().getLiveStreamManager().setLiveUrl(liveShowUrl);
             int result = DJISDKManager.getInstance().getLiveStreamManager().startStream();
 
@@ -1229,7 +1231,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
     }
 
     public void  ToastUtils(String string){
-        Toast.makeText(getApplicationContext(),string,Toast.LENGTH_LONG).show();
+        setResultToToast(string);
     }
     public void  setResultToToast(String string){
         Toast.makeText(getApplicationContext(),string,Toast.LENGTH_LONG).show();

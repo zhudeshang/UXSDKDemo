@@ -10,11 +10,13 @@
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/drawable/round_btn_normal.xml" value="0.1875" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/drawable/round_btn_pressed.xml" value="0.1875" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/drawable/selector_white_gray.xml" value="0.1" />
-        <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/activity_home.xml" value="0.1" />
+        <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/activity_home.xml" value="0.4" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/activity_main.xml" value="0.5490196078431373" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/activity_map.xml" value="0.1" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/activity_setting.xml" value="0.12708333333333333" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/activity_waypoint1.xml" value="0.1" />
+        <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/alertdialog_layout.xml" value="0.264" />
+        <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/custom_view.xml" value="0.152" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/dialog_waypoint2setting.xml" value="0.536" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/dialog_waypoint_v2.xml" value="0.1" />
         <entry key="..\:/Users/79975/AndroidStudioProjects/Android-UXSDKDemo-master2/UXSDKDemo/app/src/main/res/layout/layout_multi_tracking.xml" value="0.16077898550724637" />

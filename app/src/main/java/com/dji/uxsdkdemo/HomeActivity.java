@@ -4,8 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +17,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +48,7 @@ public class HomeActivity extends DemoBaseActivity implements ActiveTrackMission
 
     protected Button loginBtn;
     protected Button beginFlyBtn;
+    protected Button setting;
     protected TextView bindingStateTV;
     protected TextView appActivationStateTV;
     @Override
@@ -81,10 +87,49 @@ public class HomeActivity extends DemoBaseActivity implements ActiveTrackMission
 
         loginBtn = (Button) findViewById(R.id.btn_login);
         loginBtn.setOnClickListener(this);
+        setting = (Button) findViewById(R.id.btn_setting);
+        setting.setOnClickListener(this);
         beginFlyBtn = (Button) findViewById(R.id.begin_fly);
         beginFlyBtn.setOnClickListener(this);
     }
 
+
+    private String userName;
+    private String userPassword;
+    private EditText view_url;
+    private EditText userPasswordEdit;
+    private View alertDialogView;
+
+    private void setting(View v){
+        SharedPreferences sharedPreferences =
+                getSharedPreferences("setting", Context.MODE_PRIVATE);
+
+        AlertDialog.Builder loginAlertDialog = new AlertDialog.Builder (HomeActivity.this);
+        alertDialogView = getLayoutInflater ().inflate (R.layout.alertdialog_layout, null, false);
+        loginAlertDialog.setView (alertDialogView);
+
+
+
+        final EditText et = alertDialogView.findViewById (R.id.view_url);
+        et.setText(sharedPreferences.getString("url", "请输入直播地址!"));
+        loginAlertDialog.setPositiveButton ("OK", new DialogInterface.OnClickListener () {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                view_url = alertDialogView.findViewById (R.id.view_url);
+
+                SharedPreferences sharedPreferences = getSharedPreferences("setting", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+                editor.putString("url", view_url.getText ().toString ());
+                editor.commit();//提交修改
+
+//                userPasswordEdit = alertDialogView.findViewById (R.id.nian_text);
+//                userName = view_url.getText ().toString ();
+//                userPassword = userPasswordEdit.getText ().toString ();
+            }
+        });
+
+        loginAlertDialog.show ();
+    }
 
 
     private void loginAccount(){
@@ -195,10 +240,10 @@ public class HomeActivity extends DemoBaseActivity implements ActiveTrackMission
                 }
                 break;
             }
-//            case R.id.btn_setting:{
-//                setting();
-//                break;
-//            }
+            case R.id.btn_setting:{
+                setting(v);
+                break;
+            }
             default:
                 break;
         }
