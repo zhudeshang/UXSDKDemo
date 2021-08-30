@@ -1,8 +1,10 @@
 package com.dji.uxsdkdemo;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.RectF;
@@ -27,16 +29,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.CameraUpdate;
+import com.amap.api.maps2d.CameraUpdateFactory;
+import com.amap.api.maps2d.MapView;
+import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.Marker;
+import com.amap.api.maps2d.model.MarkerOptions;
+
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
+import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.activetrack.ActiveTrackMission;
 import dji.common.mission.activetrack.ActiveTrackMissionEvent;
 import dji.common.mission.activetrack.ActiveTrackMode;
@@ -45,6 +59,13 @@ import dji.common.mission.activetrack.ActiveTrackTargetState;
 import dji.common.mission.activetrack.ActiveTrackTrackingState;
 import dji.common.mission.activetrack.QuickShotMode;
 import dji.common.mission.activetrack.SubjectSensingState;
+import dji.common.mission.waypoint.Waypoint;
+import dji.common.mission.waypoint.WaypointMission;
+import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
+import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
+import dji.common.mission.waypoint.WaypointMissionFinishedAction;
+import dji.common.mission.waypoint.WaypointMissionHeadingMode;
+import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 import dji.common.realname.AircraftBindingState;
 import dji.common.realname.AppActivationState;
 import dji.common.useraccount.UserAccountState;
@@ -56,17 +77,23 @@ import dji.keysdk.KeyManager;
 import dji.keysdk.callback.ActionCallback;
 import dji.keysdk.callback.SetCallback;
 import dji.midware.media.DJIVideoDataRecver;
+import dji.sdk.base.BaseProduct;
+import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.activetrack.ActiveTrackMissionOperatorListener;
 import dji.sdk.mission.activetrack.ActiveTrackOperator;
+import dji.sdk.mission.waypoint.WaypointMissionOperator;
+import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
+import com.amap.api.maps2d.AMap.OnMapClickListener;
+import dji.sdk.products.Aircraft;
 import dji.sdk.realname.AppActivationManager;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.sdkmanager.LiveStreamManager;
 import dji.sdk.useraccount.UserAccountManager;
+import dji.ux.widget.MapWidget;
 
 
-
-public class MainActivity extends DemoBaseActivity implements TextureView.SurfaceTextureListener, CompoundButton.OnCheckedChangeListener, ActiveTrackMissionOperatorListener, View.OnTouchListener, View.OnClickListener {
+public class MainActivity extends DemoBaseActivity implements TextureView.SurfaceTextureListener, OnMapClickListener,CompoundButton.OnCheckedChangeListener, ActiveTrackMissionOperatorListener, View.OnTouchListener, View.OnClickListener {
 
     private String liveShowUrl = "please input your live show url here";
 
@@ -100,6 +127,31 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
     private RelativeLayout mBgLayout;
     private RelativeLayout.LayoutParams layoutParams;
 
+
+    private MapView mapView;
+    private AMap aMap;
+
+    private Button locate, add, clear;
+    private Button config, upload, start, stop;
+
+    private boolean isAdd = false;
+
+    private double droneLocationLat = 181, droneLocationLng = 181;
+    private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
+    private Marker droneMarker = null;
+
+    private float altitude = 100.0f;
+    private float mSpeed = 10.0f;
+
+    private List<Waypoint> waypointList = new ArrayList<>();
+
+    public static WaypointMission.Builder waypointMissionBuilder;
+    private FlightController mFlightController;
+    private WaypointMissionOperator instance;
+    private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
+    private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
+
+
     public MainActivity() {
     }
 
@@ -126,6 +178,19 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
         setContentView(R.layout.activity_main);
         initUI();
         initData();
+
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DemoApplication.FLAG_CONNECTION_CHANGE);
+        registerReceiver(mReceiver, filter);
+
+        mapView = (MapView) findViewById(R.id.map);
+        mapView.onCreate(savedInstanceState);
+
+
+        initMapView();
+        addListener();
+        onProductConnectionChange();
     }
     private void initUI(){
 
@@ -159,6 +224,197 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
 
         mBgLayout = (RelativeLayout) findViewById(R.id.tracking_bg_layout);
         mBgLayout.setOnTouchListener(this);
+    }
+
+
+    private void initMapView() {
+
+        if (aMap == null) {
+            aMap = mapView.getMap();
+            aMap.setOnMapClickListener(this);// add the listener for click for amap object
+        }
+
+        LatLng shenzhen = new LatLng(22.5362, 113.9454);
+        aMap.addMarker(new MarkerOptions().position(shenzhen).title("Marker in Shenzhen"));
+        aMap.moveCamera(CameraUpdateFactory.newLatLng(shenzhen));
+    }
+    protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            onProductConnectionChange();
+        }
+    };
+
+    private void onProductConnectionChange()
+    {
+        initFlightController();
+        loginAccount();
+    }
+    private void loginAccount(){
+
+        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
+                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
+                    @Override
+                    public void onSuccess(final UserAccountState userAccountState) {
+                        Log.e(TAG, "Login Success");
+                    }
+                    @Override
+                    public void onFailure(DJIError error) {
+                        setResultToToast("Login Error:"
+                                + error.getDescription());
+                    }
+                });
+    }
+
+    private void initFlightController() {
+
+        BaseProduct product = DemoApplication.getProductInstance();
+        if (product != null && product.isConnected()) {
+            if (product instanceof Aircraft) {
+                mFlightController = ((Aircraft) product).getFlightController();
+            }
+        }
+
+        if (mFlightController != null) {
+
+            mFlightController.setStateCallback(
+                    new FlightControllerState.Callback() {
+                        @Override
+                        public void onUpdate(FlightControllerState
+                                                     djiFlightControllerCurrentState) {
+                            droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
+                            droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
+                            updateDroneLocation();
+                        }
+                    });
+
+        }
+    }
+
+    //Add Listener for WaypointMissionOperator
+    private void addListener() {
+        if (getWaypointMissionOperator() != null) {
+            getWaypointMissionOperator().addListener(eventNotificationListener);
+        }
+    }
+
+
+    private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
+        @Override
+        public void onDownloadUpdate(WaypointMissionDownloadEvent downloadEvent) {
+
+        }
+
+        @Override
+        public void onUploadUpdate(WaypointMissionUploadEvent uploadEvent) {
+
+        }
+
+        @Override
+        public void onExecutionUpdate(WaypointMissionExecutionEvent executionEvent) {
+
+        }
+
+        @Override
+        public void onExecutionStart() {
+
+        }
+
+        @Override
+        public void onExecutionFinish(@Nullable final DJIError error) {
+            setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
+        }
+    };
+
+    public WaypointMissionOperator getWaypointMissionOperator() {
+        if (instance == null) {
+            instance = DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
+        }
+        return instance;
+    }
+
+    @Override
+    public void onMapClick(LatLng point) {
+        if (isAdd == true){
+            markWaypoint(point);
+            Waypoint mWaypoint = new Waypoint(point.latitude, point.longitude, altitude);
+            //Add Waypoints to Waypoint arraylist;
+            if (waypointMissionBuilder != null) {
+                waypointList.add(mWaypoint);
+                waypointMissionBuilder.waypointList(waypointList).waypointCount(waypointList.size());
+            }else
+            {
+                waypointMissionBuilder = new WaypointMission.Builder();
+                waypointList.add(mWaypoint);
+                waypointMissionBuilder.waypointList(waypointList).waypointCount(waypointList.size());
+            }
+        }else{
+//            setResultToToast("Cannot Add Waypoint");
+        }
+    }
+    public static boolean checkGpsCoordination(double latitude, double longitude) {
+        return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) && (latitude != 0f && longitude != 0f);
+    }
+
+    // 根据MCU的状态更新无人机位置。
+    private void updateDroneLocation(){
+
+        LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
+        //创建MarkerOptions对象
+        final MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(pos);
+        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.aircraft));
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (droneMarker != null) {
+                    droneMarker.remove();
+                }
+
+                if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
+                    droneMarker = aMap.addMarker(markerOptions);
+                }
+            }
+        });
+    }
+
+    private void markWaypoint(LatLng point){
+        //创建MarkerOptions对象
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(point);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        Marker marker = aMap.addMarker(markerOptions);
+        mMarkers.put(mMarkers.size(), marker);
+    }private void cameraUpdate(){
+        LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
+        float zoomlevel = (float) 18.0;
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(pos, zoomlevel);
+        aMap.moveCamera(cu);
+
+    }
+
+    private void enableDisableAdd(){
+        if (isAdd == false) {
+            isAdd = true;
+            add.setText("Exit");
+        }else{
+            isAdd = false;
+            add.setText("Add");
+        }
+    } String nulltoIntegerDefalt(String value){
+        if(!isIntValue(value)) value="0";
+        return value;
+    }
+
+    boolean isIntValue(String val)
+    {
+        try {
+            val=val.replace(" ","");
+            Integer.parseInt(val);
+        } catch (Exception e) {return false;}
+        return true;
     }
     @Override
     public void onClick(View v) {
@@ -1187,6 +1443,7 @@ public class MainActivity extends DemoBaseActivity implements TextureView.Surfac
     public void onResume() {
         Log.e(TAG, "onResume");
         setUpListener();
+        initFlightController();
         super.onResume();
     }
 

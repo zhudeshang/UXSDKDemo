@@ -181,18 +181,18 @@
             android:textSize="8sp"
             android:text="开启跟踪模式" />
         <Button
-            android:id="@+id/way_point1"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:textSize="8sp"
-            android:text="Map" />
-        <Button
             android:id="@+id/btn_start_live_show"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:textSize="8sp"
             android:text="开始直播" />
-
+        <Button
+            android:id="@+id/way_point1"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textSize="8sp"
+            android:visibility="invisible"
+            android:text="Map" />
     </LinearLayout>
 
 
@@ -257,6 +257,7 @@
         android:layout_width="514dp"
         android:layout_height="305dp"
         android:layout_alignParentBottom="true"
+        android:visibility="invisible"
         android:layout_marginLeft="80dp">
 
         <Button
@@ -291,4 +292,17 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginRight="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <com.amap.api.maps2d.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 </RelativeLayout>

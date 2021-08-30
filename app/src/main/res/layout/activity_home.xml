@@ -70,14 +70,13 @@
         android:id="@+id/tv_activation_state_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginBottom="20dp"
         android:text="未登录"
         android:textColor="@color/black"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="60dp"
-        android:textSize="22sp"
-        />
+        android:textSize="22sp" />
 
     <ImageView
         android:id="@+id/iv2"
